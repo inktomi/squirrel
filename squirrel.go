@@ -29,9 +29,9 @@ func main() {
 
 	fmt.Println("Starting to buzz")
 	for i := 0; i < 10; i++ {
-		time.Sleep(500 * time.Microsecond)
+		time.Sleep(500 * time.Millisecond)
 		pin.High()
-		time.Sleep(200 * time.Microsecond)
+		time.Sleep(200 * time.Millisecond)
 		pin.Low()
 	}
 
