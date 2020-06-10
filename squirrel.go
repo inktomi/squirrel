@@ -28,11 +28,9 @@ func main() {
 	pin.Output()
 
 	fmt.Println("Starting to buzz")
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 100; i++ {
 		time.Sleep(500 * time.Millisecond)
-		pin.High()
-		time.Sleep(200 * time.Millisecond)
-		pin.Low()
+		pin.Toggle()
 	}
 
 	fmt.Println("Done. Good day.")
