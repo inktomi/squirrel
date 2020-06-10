@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"time"
+
+	"github.com/MichaelS11/go-hx711"
 )
 
 // import "github.com/stianeikeland/go-rpio"
@@ -17,13 +18,37 @@ func main() {
 		ProjectPackages: []string{"main", "github.com/inktomi/squirrel"},
 	})
 
-	err := bugsnag.Notify(fmt.Errorf("test error"))
+	err := hx711.HostInit()
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("HostInit error:", err)
+		return
 	}
 
-	time.Sleep(10 * time.Second)
+	hx711chip, err := hx711.NewHx711("GPIO5", "GPIO4")
+	if err != nil {
+		fmt.Println("NewHx711 error:", err)
+		return
+	}
 
-	log.Print("Finished")
+	defer hx711chip.Shutdown()
+
+	err = hx711chip.Reset()
+	if err != nil {
+		fmt.Println("Reset error:", err)
+		return
+	}
+
+	var data int
+	for i := 0; i < 10000; i++ {
+		time.Sleep(200 * time.Microsecond)
+
+		data, err = hx711chip.ReadDataRaw()
+		if err != nil {
+			fmt.Println("ReadDataRaw error:", err)
+			continue
+		}
+
+		fmt.Println(data)
+	}
 
 }
