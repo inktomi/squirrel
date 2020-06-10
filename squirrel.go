@@ -23,16 +23,19 @@ func main() {
 		return
 	}
 
-	pin := rpio.Pin(6)
+	pin := rpio.Pin(10)
 
 	pin.Output()
 
-	for i := 0; i < 1000; i++ {
+	fmt.Println("Starting to buzz")
+	for i := 0; i < 10; i++ {
 		time.Sleep(500 * time.Microsecond)
 		pin.High()
 		time.Sleep(200 * time.Microsecond)
 		pin.Low()
 	}
+
+	fmt.Println("Done. Good day.")
 
 	//err := hx711.HostInit()
 	//if err != nil {
