@@ -30,10 +30,17 @@ func main() {
 	fmt.Println("Starting to buzz")
 	for i := 0; i < 100; i++ {
 		time.Sleep(500 * time.Millisecond)
-		pin.Toggle()
+		pin.High()
+		time.Sleep(500 * time.Millisecond)
+		pin.Low()
 	}
 
 	fmt.Println("Done. Good day.")
+
+	closeError := rpio.Close()
+	if closeError != nil {
+		fmt.Println("Failed to close:", closeError)
+	}
 
 	//err := hx711.HostInit()
 	//if err != nil {
