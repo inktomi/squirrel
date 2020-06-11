@@ -23,16 +23,16 @@ func main() {
 		return
 	}
 
-	pin := rpio.Pin(10)
+	pin := rpio.Pin(6)
 
 	pin.Output()
 
 	fmt.Println("Starting to buzz")
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 10; i++ {
 		time.Sleep(500 * time.Millisecond)
-		pin.High()
+		pin.Low() // Buzz
 		time.Sleep(500 * time.Millisecond)
-		pin.Low()
+		pin.High() // Off
 	}
 
 	fmt.Println("Done. Good day.")
