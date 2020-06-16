@@ -3,24 +3,15 @@ package main
 import (
 	"fmt"
 	"github.com/MichaelS11/go-hx711"
-	"github.com/adafruit/io-client-go"
+	"github.com/reef-pi/adafruitio"
 	"github.com/stianeikeland/go-rpio"
 	"os"
 	"time"
 )
 
-import "github.com/bugsnag/bugsnag-go"
-
 func main() {
-	bugsnag.Configure(bugsnag.Configuration{
-		APIKey: os.Getenv("BUGSNAG_KEY"),
-		// The import paths for the Go packages containing your source files
-		ProjectPackages: []string{"main", "github.com/inktomi/squirrel"},
-	})
-
-	adafruitClient := adafruitio.NewClient(os.Getenv("ADAFRUIT_IO_KEY"))
-	feed := &aio.Feed{Name: "Weight", Key: "load-cell-weight"}
-	client.SetFeed(newFeed)
+	configureBugsnag()
+	client := configureTelemetry()
 
 	err := rpio.Open()
 	if err != nil {
@@ -69,7 +60,7 @@ func main() {
 
 	var data int
 	for i := 0; i < 10000; i++ {
-		time.Sleep(200 * time.Microsecond)
+		time.Sleep(2 * time.Second)
 
 		data, err = hx711chip.ReadDataRaw()
 		if err != nil {
@@ -77,7 +68,13 @@ func main() {
 			continue
 		}
 
-		client.Data.Send(&adafruitio.Data{Value: data})
+		telemetryData := adafruitio.Data { Value: data }
+		feed := "load_cell_value"
+
+		err := client.SubmitData(os.Getenv("ADAFRUIT_IO_KEY"), feed, telemetryData)
+		if err != nil {
+			fmt.Println("Submit telemetry error:", err)
+		}
 
 		fmt.Println(data)
 	}
