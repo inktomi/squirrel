@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/MichaelS11/go-hx711"
+	"github.com/adafruit/io-client-go"
 	"github.com/stianeikeland/go-rpio"
 	"os"
 	"time"
@@ -16,6 +17,10 @@ func main() {
 		// The import paths for the Go packages containing your source files
 		ProjectPackages: []string{"main", "github.com/inktomi/squirrel"},
 	})
+
+	adafruitClient := adafruitio.NewClient(os.Getenv("ADAFRUIT_IO_KEY"))
+	feed := &aio.Feed{Name: "Weight", Key: "load-cell-weight"}
+	client.SetFeed(newFeed)
 
 	err := rpio.Open()
 	if err != nil {
@@ -71,6 +76,8 @@ func main() {
 			fmt.Println("ReadDataRaw error:", err)
 			continue
 		}
+
+		client.Data.Send(&adafruitio.Data{Value: data})
 
 		fmt.Println(data)
 	}
