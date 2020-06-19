@@ -12,4 +12,5 @@ it will work. Changes will be made based on learnings.
 
 ## Environment Variables
 - `ADAFRUIT_IO_KEY` the Adafruit.io api key, to track weight and related data
+- `ADAFRUIT_IO_USER` your username on Adafruit.io for MQTT logs
 - `BUGSNAG_KEY` the api key for bugsnag, to track errors

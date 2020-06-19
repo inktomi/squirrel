@@ -11,11 +11,17 @@ func main() {
 	if adafruitClient, err := telemetry.CreateClient(); err != nil {
 		log.Panicf("Failed to setup & connect to MQTT Topic: %v", err)
 	} else {
+		defer func(client *telemetry.Adafruit) {
+			if err := adafruitClient.Disconnect(); err != nil {
+				telemetry.ReportError(err, "Failed to shut down Adafruit Client.")
+			}
+		}(adafruitClient)
+
 		for i := 0; i < 10; i++ {
 			time.Sleep(2 * time.Second)
-			err := adafruitClient.SendDataPoint(i)
-			if err != nil {
+			if err := adafruitClient.SendDataPoint(i); err != nil {
 				telemetry.ReportError(err, "Failed to send telemetry data to Adafruit")
+				break
 			}
 		}
 	}

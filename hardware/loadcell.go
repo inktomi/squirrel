@@ -20,7 +20,11 @@ func MonitorWeight(adafruit *telemetry.Adafruit) {
 		return
 	}
 
-	defer hx711chip.Shutdown()
+	defer func(hx711chip *hx711.Hx711) {
+		if err := hx711chip.Shutdown(); err != nil {
+			telemetry.ReportError(err, "Failed to shut down HX711")
+		}
+	}(hx711chip)
 
 	err = hx711chip.Reset()
 	if err != nil {
