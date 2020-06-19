@@ -70,7 +70,7 @@ func (af Adafruit) Disconnect() error {
 	return nil
 }
 
-func (af Adafruit) SendDataPoint(data int) error {
+func (af Adafruit) SendDataPoint(data float64) error {
 	var payload = fmt.Sprintf("%v", data)
 
 	if token := af.client.Publish(af.topic, 0, false, payload); token.Wait() && token.Error() != nil {

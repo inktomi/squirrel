@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	github.com/MichaelS11/go-hx711 v1.0.0
+	github.com/RobinUS2/golang-moving-average v1.0.0 // indirect
 	github.com/bitly/go-simplejson v0.5.0 // indirect
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/bugsnag/bugsnag-go v1.5.3

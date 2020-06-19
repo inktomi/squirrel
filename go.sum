@@ -1,5 +1,7 @@
 github.com/MichaelS11/go-hx711 v1.0.0 h1:B6b2Gg4mEgb98LrUdwvpbzQwgxp+C6jtwUn0fuDD6WA=
 github.com/MichaelS11/go-hx711 v1.0.0/go.mod h1:VU0KBdA+wBFtLM+Mvoc5ztBXoNpSZCxRtNCyfTVvIpk=
+github.com/RobinUS2/golang-moving-average v1.0.0 h1:PD7DDZNt+UFb9XlsBbTIu/DtXqqaD/MD86DYnk3mwvA=
+github.com/RobinUS2/golang-moving-average v1.0.0/go.mod h1:MdzhY+KoEvi+OBygTPH0OSaKrOJzvILWN2SPQzaKVsY=
 github.com/bitly/go-simplejson v0.5.0 h1:6IH+V8/tVMab511d5bn4M7EwGXZf9Hj6i2xSwkNEM+Y=
 github.com/bitly/go-simplejson v0.5.0/go.mod h1:cXHtHw4XUPsvGaxgjIAn8PhEWG9NfngEKAMDJEczWVA=
 github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 h1:DDGfHa7BWjL4YnC6+E63dPcxHo2sUxDIu8g3QgEJdRY=
