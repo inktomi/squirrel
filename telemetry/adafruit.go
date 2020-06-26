@@ -3,6 +3,7 @@ package telemetry
 import (
 	"fmt"
 	"github.com/eclipse/paho.mqtt.golang"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"time"
 )
@@ -36,17 +37,17 @@ func CreateClient() (*Adafruit, error) {
 
 	client := mqtt.NewClient(options)
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		ReportError(token.Error(), "Failed to connect to Adafruit MQTT broker")
+		log.Error(token.Error(), "Failed to connect to Adafruit MQTT broker")
 		return &Adafruit{}, token.Error()
 	}
 
 	if token := client.Subscribe(username+"/feeds/"+feedName, 0, handler); token.Wait() && token.Error() != nil {
-		ReportError(token.Error(), "Failed to subscribe to MQTT Feed")
+		log.Error(token.Error(), "Failed to subscribe to MQTT Feed")
 		return &Adafruit{}, token.Error()
 	}
 
 	if token := client.Subscribe(username+"/errors", 0, handler); token.Wait() && token.Error() != nil {
-		ReportError(token.Error(), "Failed to subscribe to MQTT Error Feed")
+		log.Error(token.Error(), "Failed to subscribe to MQTT Error Feed")
 		return &Adafruit{}, token.Error()
 	}
 
@@ -61,7 +62,7 @@ func CreateClient() (*Adafruit, error) {
 
 func (af Adafruit) Disconnect() error {
 	if token := af.client.Unsubscribe(af.feed, af.errors); token.Wait() && token.Error() != nil {
-		ReportError(token.Error(), "Failed to unsubscribe.")
+		log.Error(token.Error(), "Failed to unsubscribe.")
 		return token.Error()
 	}
 

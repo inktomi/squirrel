@@ -4,31 +4,34 @@ import (
 	movingaverage "github.com/RobinUS2/golang-moving-average"
 	"github.com/inktomi/squirrel/hardware"
 	"github.com/inktomi/squirrel/telemetry"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"math"
 	"time"
 )
 
 func main() {
-	telemetry.ConfigureBugsnag()
+	log.SetFormatter(&log.TextFormatter{})
+
 	if err := hardware.Setup(); err != nil {
-		log.Panicf("Failed to setup HX711: %v", err)
+		log.Fatal("Failed to setup HX711: %v", err)
+		panic("Cannot continue without HX711.")
 	}
 
 	if adafruitClient, err := telemetry.CreateClient(); err != nil {
-		log.Panicf("Failed to setup & connect to MQTT Topic: %v", err)
+		log.Fatal("Failed to setup & connect to MQTT Topic: %v", err)
+		panic("Cannot continue without Adafruit.io dashboard")
 	} else {
 		// Clean up MQTT
 		defer func(client *telemetry.Adafruit) {
 			if err := adafruitClient.Disconnect(); err != nil {
-				telemetry.ReportError(err, "Failed to shut down Adafruit Client.")
+				log.Error(err, "Failed to shut down Adafruit Client.")
 			}
 		}(adafruitClient)
 
 		// Clean up HX711
 		defer func() {
 			if err := hardware.Shutdown(); err != nil {
-				telemetry.ReportError(err, "Failed to shut down HX711")
+				log.Error(err, "Failed to shut down HX711")
 			}
 		}()
 
@@ -39,7 +42,7 @@ func main() {
 			time.Sleep(100 * time.Millisecond)
 
 			if weight, err := hardware.GetWeight(); err != nil {
-				telemetry.ReportError(err, "Failed to retrieve weight value")
+				log.Error(err, "Failed to retrieve weight value")
 			} else {
 				// 10 weights per second
 				// 600 weights per minute
@@ -54,7 +57,7 @@ func main() {
 					//}
 
 					if err := reportWeightIfNeeded(lastReported, adafruitClient, variance); err != nil {
-						telemetry.ReportError(err, "Failed to send telemetry data to Adafruit")
+						log.Error(err, "Failed to send telemetry data to Adafruit")
 					}
 				} else {
 					// We're calibrating.

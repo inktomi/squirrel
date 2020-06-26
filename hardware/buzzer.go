@@ -2,7 +2,7 @@ package hardware
 
 import (
 	"fmt"
-	"github.com/inktomi/squirrel/telemetry"
+	log "github.com/sirupsen/logrus"
 	"github.com/stianeikeland/go-rpio/v4"
 	"time"
 )
@@ -22,7 +22,7 @@ func setupPin() (rpio.Pin, error) {
 
 func closePin() {
 	if err := rpio.Close(); err != nil {
-		telemetry.ReportError(err, "Failed to close pin")
+		log.Error(err, "Failed to close pin")
 	}
 }
 

@@ -3,7 +3,7 @@ package hardware
 import (
 	"fmt"
 	"github.com/MichaelS11/go-hx711"
-	"github.com/inktomi/squirrel/telemetry"
+	log "github.com/sirupsen/logrus"
 )
 
 var hx711chip *hx711.Hx711 = nil
@@ -35,7 +35,7 @@ func Shutdown() error {
 	}
 
 	if err := hx711chip.Shutdown(); err != nil {
-		telemetry.ReportError(err, "Failed to shut down HX711")
+		log.Error(err, "Failed to shut down HX711")
 		return err
 	}
 
@@ -44,13 +44,13 @@ func Shutdown() error {
 
 func GetWeight() (int, error) {
 	if err := hx711chip.Reset(); err != nil {
-		telemetry.ReportError(err, "Reset error")
+		log.Error(err, "Reset HX711 had an error")
 		return 0, err
 	}
 
 	var data int
 	if rawData, err := hx711chip.ReadDataRaw(); err != nil {
-		telemetry.ReportError(err, "ReadDataRaw error")
+		log.Error(err, "ReadDataRaw had an error")
 		return 0, err
 	} else {
 		data = rawData
