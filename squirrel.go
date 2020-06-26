@@ -65,6 +65,11 @@ func main() {
 					}
 				} else {
 					// We're calibrating.
+					log.WithFields(log.Fields{
+						"weight":            weight,
+						"calibration_count": movingAverage.Count(),
+						"calibration_value": movingAverage.Avg(),
+					})
 					log.WithField("weight", weight).Info("Added weight to calibration")
 					//hardware.SingleBeep()
 				}
