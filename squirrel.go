@@ -69,8 +69,7 @@ func main() {
 						"weight":            weight,
 						"calibration_count": movingAverage.Count(),
 						"calibration_value": movingAverage.Avg(),
-					})
-					log.WithField("weight", weight).Info("Added weight to calibration")
+					}).Info("Added weight to calibration")
 					//hardware.SingleBeep()
 				}
 			}
