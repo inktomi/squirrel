@@ -20,12 +20,10 @@ func main() {
 
 	if err := hardware.Setup(); err != nil {
 		log.Fatal("Failed to setup HX711: %v", err)
-		panic("Cannot continue without HX711.")
 	}
 
 	if adafruitClient, err := telemetry.CreateClient(); err != nil {
 		log.Fatal("Failed to setup & connect to MQTT Topic: %v", err)
-		panic("Cannot continue without Adafruit.io dashboard")
 	} else {
 		// Clean up MQTT
 		defer func(client *telemetry.Adafruit) {
@@ -67,6 +65,7 @@ func main() {
 					}
 				} else {
 					// We're calibrating.
+					log.WithField("weight", weight).Info("Added weight to calibration")
 					//hardware.SingleBeep()
 				}
 			}
@@ -75,12 +74,12 @@ func main() {
 }
 
 func reportWeightIfNeeded(lastReported time.Time, adafruitClient *telemetry.Adafruit, weight float64) error {
-	if time.Now().Sub(lastReported) >= 10*time.Second {
+	if time.Now().Sub(lastReported).Seconds() >= time.Duration(10).Seconds() {
 
 		if err := adafruitClient.SendDataPoint(weight); err != nil {
 			return err
 		} else {
-			log.Info(weight, "Reported weight %f to Adafruit.io")
+			log.WithField("weight", weight).Info("Reported weight to adafruit")
 			lastReported = time.Now()
 		}
 	}
