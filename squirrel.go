@@ -6,11 +6,17 @@ import (
 	"github.com/inktomi/squirrel/telemetry"
 	log "github.com/sirupsen/logrus"
 	"math"
+	"os"
 	"time"
 )
 
 func main() {
-	log.SetFormatter(&log.TextFormatter{})
+	file, err := os.OpenFile("squirrel.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err == nil {
+		log.SetOutput(file)
+	} else {
+		log.Info("Failed to log to file, using default stderr")
+	}
 
 	if err := hardware.Setup(); err != nil {
 		log.Fatal("Failed to setup HX711: %v", err)
@@ -69,10 +75,12 @@ func main() {
 }
 
 func reportWeightIfNeeded(lastReported time.Time, adafruitClient *telemetry.Adafruit, weight float64) error {
-	if time.Now().Sub(lastReported) >= 3*time.Second {
+	if time.Now().Sub(lastReported) >= 10*time.Second {
+
 		if err := adafruitClient.SendDataPoint(weight); err != nil {
 			return err
 		} else {
+			log.Info(weight, "Reported weight %f to Adafruit.io")
 			lastReported = time.Now()
 		}
 	}
