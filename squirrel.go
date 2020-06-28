@@ -78,13 +78,14 @@ func main() {
 }
 
 func reportWeightIfNeeded(lastReported time.Time, adafruitClient *telemetry.Adafruit, weight float64) error {
-	if time.Now().Sub(lastReported).Seconds() >= time.Duration(10).Seconds() {
+	now := time.Now()
+	if now.Sub(lastReported).Seconds() >= time.Duration(10).Seconds() {
 
 		if err := adafruitClient.SendDataPoint(weight); err != nil {
 			return err
 		} else {
 			log.WithField("weight", weight).Info("Reported weight to adafruit")
-			lastReported = time.Now()
+			lastReported = now
 		}
 	}
 
