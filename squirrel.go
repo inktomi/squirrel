@@ -61,7 +61,7 @@ func main() {
 					//	hardware.Alarm()
 					//}
 
-					if err := ReportWeightIfNeeded(lastReported, adafruitClient, variance); err != nil {
+					if err := ReportWeightIfNeeded(&lastReported, adafruitClient, variance); err != nil {
 						log.Error(err, "Failed to send telemetry data to Adafruit")
 					}
 				} else {
@@ -78,9 +78,9 @@ func main() {
 	}
 }
 
-func ReportWeightIfNeeded(lastReported int64, adafruitClient *telemetry.Adafruit, weight float64) error {
+func ReportWeightIfNeeded(lastReported *int64, adafruitClient *telemetry.Adafruit, weight float64) error {
 	var now = time.Now().Unix()
-	var interval = now - lastReported
+	var interval = now - *lastReported
 
 	if interval > 20 {
 		if err := adafruitClient.SendDataPoint(weight); err != nil {
@@ -89,15 +89,15 @@ func ReportWeightIfNeeded(lastReported int64, adafruitClient *telemetry.Adafruit
 			log.WithFields(log.Fields{
 				"weight":       weight,
 				"now":          now,
-				"lastReported": lastReported,
+				"lastReported": *lastReported,
 				"interval":     interval,
 			}).Info("Reported weight to adafruit.")
-			lastReported = now
+			lastReported = &now
 		}
 	} else {
 		log.WithFields(log.Fields{
 			"now":          now,
-			"lastReported": lastReported,
+			"lastReported": *lastReported,
 			"interval":     interval,
 		}).Error("Reporting too fast.")
 
