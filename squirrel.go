@@ -53,7 +53,7 @@ func main() {
 				// 600 weights per minute
 				// 1200 weights for calibration
 				movingAverage.Add(float64(weight))
-				if movingAverage.Count() >= 100 {
+				if movingAverage.Count() >= 1000 {
 					var zeroValue = movingAverage.Avg()
 
 					var variance = math.Abs(zeroValue - float64(weight))
