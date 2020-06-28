@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	movingaverage "github.com/RobinUS2/golang-moving-average"
 	"github.com/inktomi/squirrel/hardware"
 	"github.com/inktomi/squirrel/telemetry"
@@ -60,7 +61,7 @@ func main() {
 					//	hardware.Alarm()
 					//}
 
-					if err := reportWeightIfNeeded(lastReported, adafruitClient, variance); err != nil {
+					if err := ReportWeightIfNeeded(lastReported.Unix(), adafruitClient, variance); err != nil {
 						log.Error(err, "Failed to send telemetry data to Adafruit")
 					}
 				} else {
@@ -77,9 +78,9 @@ func main() {
 	}
 }
 
-func reportWeightIfNeeded(lastReported time.Time, adafruitClient *telemetry.Adafruit, weight float64) error {
-	now := time.Now()
-	if now.Sub(lastReported).Seconds() >= time.Duration(10).Seconds() {
+func ReportWeightIfNeeded(lastReported int64, adafruitClient *telemetry.Adafruit, weight float64) error {
+	now := time.Now().Unix()
+	if now-lastReported > 20 {
 
 		if err := adafruitClient.SendDataPoint(weight); err != nil {
 			return err
@@ -87,6 +88,8 @@ func reportWeightIfNeeded(lastReported time.Time, adafruitClient *telemetry.Adaf
 			log.WithField("weight", weight).Info("Reported weight to adafruit")
 			lastReported = now
 		}
+	} else {
+		return errors.New("tried to report too fast")
 	}
 
 	return nil
