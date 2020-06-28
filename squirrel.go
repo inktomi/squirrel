@@ -20,11 +20,11 @@ func main() {
 	}
 
 	if err := hardware.Setup(); err != nil {
-		log.Fatal("Failed to setup HX711: %v", err)
+		log.Fatal("Failed to setup HX711", err)
 	}
 
 	if adafruitClient, err := telemetry.CreateClient(); err != nil {
-		log.Fatal("Failed to setup & connect to MQTT Topic: %v", err)
+		log.Fatal("Failed to setup & connect to MQTT Topic", err)
 	} else {
 		// Clean up MQTT
 		defer func(client *telemetry.Adafruit) {
@@ -41,7 +41,7 @@ func main() {
 		}()
 
 		// Set up the loop to track weights in
-		var lastReported = time.Now()
+		var lastReported int64 = 0
 		var movingAverage = movingaverage.New(1200)
 		for {
 			time.Sleep(100 * time.Millisecond)
@@ -53,7 +53,7 @@ func main() {
 				// 600 weights per minute
 				// 1200 weights for calibration
 				movingAverage.Add(float64(weight))
-				if movingAverage.Count() >= 1200 {
+				if movingAverage.Count() >= 100 {
 					var zeroValue = movingAverage.Avg()
 
 					var variance = math.Abs(zeroValue - float64(weight))
@@ -61,7 +61,7 @@ func main() {
 					//	hardware.Alarm()
 					//}
 
-					if err := ReportWeightIfNeeded(lastReported.Unix(), adafruitClient, variance); err != nil {
+					if err := ReportWeightIfNeeded(lastReported, adafruitClient, variance); err != nil {
 						log.Error(err, "Failed to send telemetry data to Adafruit")
 					}
 				} else {
@@ -79,16 +79,28 @@ func main() {
 }
 
 func ReportWeightIfNeeded(lastReported int64, adafruitClient *telemetry.Adafruit, weight float64) error {
-	now := time.Now().Unix()
-	if now-lastReported > 20 {
+	var now = time.Now().Unix()
+	var interval = now - lastReported
 
+	if interval > 20 {
 		if err := adafruitClient.SendDataPoint(weight); err != nil {
 			return err
 		} else {
-			log.WithField("weight", weight).Info("Reported weight to adafruit")
+			log.WithFields(log.Fields{
+				"weight":       weight,
+				"now":          now,
+				"lastReported": lastReported,
+				"interval":     interval,
+			}).Info("Reported weight to adafruit.")
 			lastReported = now
 		}
 	} else {
+		log.WithFields(log.Fields{
+			"now":          now,
+			"lastReported": lastReported,
+			"interval":     interval,
+		}).Error("Reporting too fast.")
+
 		return errors.New("tried to report too fast")
 	}
 
