@@ -56,7 +56,5 @@ func GetWeight() (int, error) {
 		data = rawData
 	}
 
-	fmt.Println(data)
-
 	return data, nil
 }
