@@ -41,7 +41,7 @@ func main() {
 
 		// Set up the loop to track weights in
 		var lastReported int64 = 0
-		var movingAverage = movingaverage.New(10)
+		var movingAverage = movingaverage.New(1200)
 		for {
 			time.Sleep(100 * time.Millisecond)
 
@@ -63,10 +63,13 @@ func main() {
 						movingAverage.Add(float64(weight))
 					}
 
-					if now, err := ReportWeightIfNeeded(lastReported, adafruitClient, variance); err != nil {
+					if reportTime, err := ReportWeightIfNeeded(lastReported, adafruitClient, variance); err != nil {
 						log.Error(err, "Failed to send telemetry data to Adafruit")
 					} else {
-						lastReported = now
+						// We don't want to change the value if we didn't report anything.
+						if reportTime > 0 {
+							lastReported = reportTime
+						}
 					}
 				} else {
 					// We're calibrating.
@@ -101,6 +104,8 @@ func ReportWeightIfNeeded(lastReported int64, adafruitClient *telemetry.Adafruit
 				"lastReported": lastReported,
 				"interval":     interval,
 			}).Info("Reported variance to adafruit.")
+
+			return now, nil
 		}
 	} else {
 		log.WithFields(log.Fields{
@@ -108,8 +113,8 @@ func ReportWeightIfNeeded(lastReported int64, adafruitClient *telemetry.Adafruit
 			"now":          now,
 			"lastReported": lastReported,
 			"interval":     interval,
-		}).Info("Did not report, time interval was not long enough.")
+		}).Trace("Did not report, time interval was not long enough.")
 	}
 
-	return now, nil
+	return -1, nil
 }
