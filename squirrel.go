@@ -102,6 +102,13 @@ func ReportWeightIfNeeded(lastReported int64, adafruitClient *telemetry.Adafruit
 				"interval":     interval,
 			}).Info("Reported variance to adafruit.")
 		}
+	} else {
+		log.WithFields(log.Fields{
+			"weight":       weight,
+			"now":          now,
+			"lastReported": lastReported,
+			"interval":     interval,
+		}).Info("Did not report, time interval was not long enough.")
 	}
 
 	return now, nil
