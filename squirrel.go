@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	file, err := os.OpenFile("squirrel.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	file, err := os.OpenFile("/var/log/squirrel.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err == nil {
 		log.SetOutput(file)
 	} else {
@@ -41,7 +41,7 @@ func main() {
 
 		// Set up the loop to track weights in
 		var lastReported int64 = 0
-		var movingAverage = movingaverage.New(1200)
+		var movingAverage = movingaverage.New(10)
 		for {
 			time.Sleep(100 * time.Millisecond)
 
@@ -51,8 +51,7 @@ func main() {
 				// 10 weights per second
 				// 600 weights per minute
 				// 1200 weights for calibration
-				movingAverage.Add(float64(weight))
-				if movingAverage.Count() >= 1000 {
+				if movingAverage.SlotsFilled() {
 					var zeroValue = movingAverage.Avg()
 
 					var variance = math.Abs(zeroValue - float64(weight))
@@ -60,6 +59,8 @@ func main() {
 						if err := hardware.Alarm(); err != nil {
 							log.Error("Failed to alarm: ", err)
 						}
+					} else {
+						movingAverage.Add(float64(weight))
 					}
 
 					if now, err := ReportWeightIfNeeded(lastReported, adafruitClient, variance); err != nil {
@@ -69,6 +70,8 @@ func main() {
 					}
 				} else {
 					// We're calibrating.
+					movingAverage.Add(float64(weight))
+
 					log.WithFields(log.Fields{
 						"weight":            weight,
 						"calibration_count": movingAverage.Count(),
@@ -97,7 +100,7 @@ func ReportWeightIfNeeded(lastReported int64, adafruitClient *telemetry.Adafruit
 				"now":          now,
 				"lastReported": lastReported,
 				"interval":     interval,
-			}).Info("Reported weight to adafruit.")
+			}).Info("Reported variance to adafruit.")
 		}
 	}
 
