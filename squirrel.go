@@ -10,6 +10,9 @@ import (
 	"time"
 )
 
+// O hook weight: 104.6 grams  (use as nothing hanging weight)
+// Hummingbird Feeder (Full):
+
 func main() {
 	file, err := os.OpenFile("/var/log/squirrel.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err == nil {
@@ -42,6 +45,11 @@ func main() {
 		// Set up the loop to track weights in
 		var lastReported int64 = 0
 		var movingAverage = movingaverage.New(1200)
+
+		if err := hardware.SingleBeep(); err != nil {
+			log.Error("Failed to beep", err)
+		}
+
 		for {
 			time.Sleep(100 * time.Millisecond)
 
@@ -56,9 +64,9 @@ func main() {
 
 					var variance = math.Abs(zeroValue - float64(weight))
 					if variance > 500 {
-						if err := hardware.Alarm(); err != nil {
-							log.Error("Failed to alarm: ", err)
-						}
+						//if err := hardware.Alarm(); err != nil {
+						//	log.Error("Failed to alarm: ", err)
+						//}
 					} else {
 						movingAverage.Add(float64(weight))
 					}
@@ -80,10 +88,6 @@ func main() {
 						"calibration_count": movingAverage.Count(),
 						"calibration_value": movingAverage.Avg(),
 					}).Info("Added weight to calibration")
-
-					if err := hardware.SingleBeep(); err != nil {
-						log.Error("Failed to beep", err)
-					}
 				}
 			}
 		}
