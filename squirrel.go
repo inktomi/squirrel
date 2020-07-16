@@ -59,13 +59,13 @@ func main() {
 				if movingAverage.SlotsFilled() {
 					var zeroValue = movingAverage.Avg()
 
-					var variance = math.Abs(zeroValue - float64(weight))
+					var variance = math.Abs(zeroValue - weight)
 					if variance > 500 {
 						//if err := hardware.Alarm(); err != nil {
 						//	log.Error("Failed to alarm: ", err)
 						//}
 					} else {
-						movingAverage.Add(float64(weight))
+						movingAverage.Add(weight)
 					}
 
 					if reportTime, err := ReportWeightIfNeeded(lastReported, adafruitClient, variance); err != nil {

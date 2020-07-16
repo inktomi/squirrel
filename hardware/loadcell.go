@@ -26,6 +26,9 @@ func Setup() error {
 		hx711chip = freshHx711
 	}
 
+	hx711chip.AdjustZero = 16383
+	hx711chip.AdjustScale = 41.110739
+
 	return nil
 }
 
@@ -42,18 +45,18 @@ func Shutdown() error {
 	return nil
 }
 
-func GetWeight() (int, error) {
+func GetWeight() (float64, error) {
 	if err := hx711chip.Reset(); err != nil {
 		log.Error(err, "Reset HX711 had an error")
 		return 0, err
 	}
 
-	var data int
-	if rawData, err := hx711chip.ReadDataRaw(); err != nil {
-		log.Error(err, "ReadDataRaw had an error")
+	var data float64
+	if medianWeight, err := hx711chip.ReadDataMedian(10); err != nil {
+		log.Error(err, "ReadDataMedian had an error")
 		return 0, err
 	} else {
-		data = rawData
+		data = medianWeight
 	}
 
 	return data, nil

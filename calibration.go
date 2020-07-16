@@ -9,6 +9,11 @@ import (
 // O hook weight: 104.6 grams  (use as nothing hanging weight)
 // Hummingbird Feeder (Full): 1091 grams
 
+/**
+  AdjustZero should be set to: 16383
+  AdjustScale should be set to a value between 0.000000 and 41.110739
+*/
+
 func main() {
 	err := hx711.HostInit()
 	if err != nil {
