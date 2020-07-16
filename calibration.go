@@ -30,7 +30,7 @@ func main() {
 	var weight2 float64
 
 	weight1 = 104.6
-	weight2 = 1091
+	weight2 = 1195.6
 
 	hx711chip.GetAdjustValues(weight1, weight2)
 }
