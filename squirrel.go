@@ -10,9 +10,6 @@ import (
 	"time"
 )
 
-// O hook weight: 104.6 grams  (use as nothing hanging weight)
-// Hummingbird Feeder (Full):
-
 func main() {
 	file, err := os.OpenFile("/var/log/squirrel.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err == nil {
